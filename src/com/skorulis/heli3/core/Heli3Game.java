@@ -1,6 +1,7 @@
 package com.skorulis.heli3.core;
 
-import java.awt.event.KeyListener;
+
+import org.jbox2d.common.Vec2;
 
 import com.skorulis.forplay.util.FrameRateCalc;
 import com.skorulis.forplay.util.InputState;
@@ -35,6 +36,7 @@ public class Heli3Game implements Game{
 		 pointer().setListener(input);
 		 
 		 Building b = new Building(world.world(),80, 200);
+		 b.physics().body().setTransform(new Vec2(50,height-b.height()), 0);
 		 world.addEntity(b);
 	}
 

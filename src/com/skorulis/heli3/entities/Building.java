@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
@@ -33,19 +34,25 @@ public class Building implements EntityI{
   
   public FixtureDef getFixtureDef() {
     FixtureDef fixtureDef = new FixtureDef();    
-    CircleShape circleShape = new CircleShape();
-    circleShape.m_radius = 10;
-    fixtureDef.shape = circleShape;
-    fixtureDef.density = 0.4f;
-    fixtureDef.friction = 0.1f;
-    fixtureDef.restitution = 0.35f;
-    circleShape.m_p.set(0, 0);
+    PolygonShape polygonShape = new PolygonShape();
+    Vec2[] polygon = new Vec2[4];
+    polygon[0] = new Vec2(0, 0);
+    polygon[1] = new Vec2(width(), 0);
+    polygon[2] = new Vec2(width(), height());
+    polygon[3] = new Vec2(0, height());
+    polygonShape.set(polygon, polygon.length);
+    fixtureDef.shape = polygonShape;
+    fixtureDef.friction = 0.4f;
     return fixtureDef;
   }
 
   @Override
   public void paint(float alpha) {
     canvas.setTranslation(physics.x(), physics.y());
+  }
+  
+  public PhysicsComponent physics() {
+	  return physics;
   }
 
   @Override
@@ -56,6 +63,14 @@ public class Building implements EntityI{
   @Override
   public Layer layer() {
     return canvas;
+  }
+
+  public int width() {
+	return canvas.canvas().width();
+  }
+  
+  public int height() {
+	return canvas.canvas().height();
   }
 
 }

@@ -23,6 +23,11 @@ public class Helicopter implements EntityI{
 
   private PhysicsComponent physics;
   private AnimatedImage image;
+  private float firerate=0.2f;
+  private float cooldown;
+  
+  private int left = -10;
+  private int top = -5;
   
   public Helicopter(World world) {
     String[] images = new String[] {"images/helicopter.png","images/helicopter2.png"};
@@ -34,19 +39,16 @@ public class Helicopter implements EntityI{
   
   public FixtureDef getFixtureDef() {
     FixtureDef fixtureDef = new FixtureDef();
-    CircleShape circleShape = new CircleShape();
-    circleShape.m_radius = 10;
-    fixtureDef.shape = circleShape;
+    fixtureDef.shape = PhysicsComponent.getRect(left, top, 20, 10);
     fixtureDef.density = 0.4f;
     fixtureDef.friction = 0.1f;
-    fixtureDef.restitution = 0.35f;
-    circleShape.m_p.set(0, 0);
+    fixtureDef.restitution = 0.05f;
     return fixtureDef;
   }
 
   @Override
   public void paint(float alpha) {
-    image.layer().setTranslation(physics.x(), physics.y());
+    image.layer().setTranslation(physics.x()+left, physics.y()+top);
   }
 
   @Override
@@ -61,12 +63,12 @@ public class Helicopter implements EntityI{
     if(input.keyDown('D')) {
       physics.move(new Vec2(100,0));
     }
-    if(input.mouseDown()) {
-      
-      
+    cooldown-=delta;
+    if(input.mouseDown() && cooldown <=0) {
       Bullet b = new Bullet(physics.x(), physics.y(),input.mouseDir(physics.body().getPosition()),  physics.body().getWorld());
       ArrayList<EventI> ret = new ArrayList<EventI>();
       ret.add(b);
+      cooldown = firerate;
       return ret;
     }
     

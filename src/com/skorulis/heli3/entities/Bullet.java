@@ -22,21 +22,24 @@ public class Bullet implements EntityI,EventI{
 
   private ImageLayer image;
   private PhysicsComponent physics;
+  private float sensorTime= 0.4f;
+  private float timeAlive;
   
   public Bullet(float x,float y,Vec2 vel,World world) {
-    image = graphics().createImageLayer(assetManager().getImage("images/helicopter.png"));
+    image = graphics().createImageLayer(assetManager().getImage("images/bullet.png"));
     physics = new PhysicsComponent(BodyType.DYNAMIC);
     physics.setFixtureDef(getFixtureDef());
     physics.createBody(world);
     physics.body().setTransform(new Vec2(x,y), 0);
-    physics.body().setLinearVelocity(new Vec2(vel.x*200,vel.y*200));
+    physics.body().setLinearVelocity(new Vec2(vel.x*22200,vel.y*22200));
     
+    //log().debug("VEL " + physics.body().getLinearVelocity());
   }
   
   public FixtureDef getFixtureDef() {
     FixtureDef fixtureDef = new FixtureDef();
     CircleShape circleShape = new CircleShape();
-    circleShape.m_radius = 10;
+    circleShape.m_radius = 8;
     fixtureDef.shape = circleShape;
     fixtureDef.density = 0.4f;
     fixtureDef.friction = 0.00f;
@@ -53,6 +56,10 @@ public class Bullet implements EntityI,EventI{
 
   @Override
   public ArrayList<EventI> update(float delta, InputState input) {
+	timeAlive+=delta;
+	if(timeAlive > sensorTime) {
+		this.physics.body().getFixtureList().setSensor(false);
+	}
     return null;
   }
 
