@@ -11,9 +11,9 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
 
+import com.skorulis.forplay.entities.Entity;
+import com.skorulis.forplay.entities.Event;
 import com.skorulis.forplay.util.InputState;
-import com.skorulis.heli3.components.EntityI;
-import com.skorulis.heli3.components.EventI;
 import static forplay.core.ForPlay.*;
 
 import forplay.core.CanvasLayer;
@@ -24,7 +24,7 @@ public class HeliWorld {
 
 	private World world;
 	private Heli3Game game;
-	private LinkedList<EntityI> entities,newEntities;
+	private LinkedList<Entity> entities,newEntities;
 	private GroupLayer entityLayer;
 	
 	private static boolean showDebugDraw = true;
@@ -37,8 +37,8 @@ public class HeliWorld {
 	  this.height = height*physScale;
 	  Vec2 gravity = new Vec2(0,80*physScale);
 	  world = new World(gravity, true);
-	  entities = new LinkedList<EntityI>();
-	  newEntities = new LinkedList<EntityI>();
+	  entities = new LinkedList<Entity>();
+	  newEntities = new LinkedList<Entity>();
 	  entityLayer = graphics().createGroupLayer();
 	  graphics().rootLayer().add(entityLayer);
 	  buildBounds(this.width, this.height);
@@ -87,14 +87,19 @@ public class HeliWorld {
 	
 	public void update(float delta,InputState input) {
 	  world.step(delta, 10, 10);
-	  java.util.Iterator<EntityI> it = entities.iterator();
-    EntityI e;
-    ArrayList<EventI> events;
+	  java.util.Iterator<Entity> it = entities.iterator();
+    Entity e;
+    ArrayList<Event> events;
     while(it.hasNext()) {
       e = it.next();
       events = e.update(delta, input);
+      if(!e.alive()) {
+        e.layer().parent().remove(e.layer());
+        it.remove();
+        world.destroyBody(e.body());
+      }
       if(events!=null) {
-        for(EventI event: events) {
+        for(Event event: events) {
           game.processEvent(event);
         }
       }
@@ -105,8 +110,8 @@ public class HeliWorld {
 	}
 	
 	public void paint(float alpha) {
-	  java.util.Iterator<EntityI> it = entities.iterator();
-	  EntityI e;
+	  java.util.Iterator<Entity> it = entities.iterator();
+	  Entity e;
 	  while(it.hasNext()) {
 	    e = it.next();
 	    e.paint(alpha);
@@ -123,7 +128,7 @@ public class HeliWorld {
 	  return world;
 	}
 	
-	public void addEntity(EntityI e) {
+	public void addEntity(Entity e) {
 	  newEntities.add(e);
 	  entityLayer.add(e.layer());
 	}

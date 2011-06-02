@@ -3,10 +3,10 @@ package com.skorulis.heli3.core;
 
 import org.jbox2d.common.Vec2;
 
+import com.skorulis.forplay.entities.Entity;
+import com.skorulis.forplay.entities.Event;
 import com.skorulis.forplay.util.FrameRateCalc;
 import com.skorulis.forplay.util.InputState;
-import com.skorulis.heli3.components.EntityI;
-import com.skorulis.heli3.components.EventI;
 import com.skorulis.heli3.entities.Building;
 import com.skorulis.heli3.entities.Helicopter;
 
@@ -68,9 +68,9 @@ public class Heli3Game implements Game{
 		return 25;
 	}
 
-  public void processEvent(EventI event) {
+  public void processEvent(Event event) {
     if(event.getType()==EventTypes.NEW_ENTITY) {
-      world.addEntity((EntityI)event);
+      world.addEntity((Entity)event);
     }
   }
 

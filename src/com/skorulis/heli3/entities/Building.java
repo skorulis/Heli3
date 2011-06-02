@@ -4,20 +4,21 @@ import java.util.ArrayList;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
+import com.skorulis.forplay.entities.Entity;
+import com.skorulis.forplay.entities.Event;
+import com.skorulis.forplay.entities.PhysicsComponent;
 import com.skorulis.forplay.util.InputState;
-import com.skorulis.heli3.components.EntityI;
-import com.skorulis.heli3.components.EventI;
-import com.skorulis.heli3.components.PhysicsComponent;
 
 import forplay.core.CanvasLayer;
 import forplay.core.Layer;
 import static forplay.core.ForPlay.*;
 
-public class Building implements EntityI{
+public class Building implements Entity{
   
   CanvasLayer canvas;
   PhysicsComponent physics;
@@ -59,7 +60,7 @@ public class Building implements EntityI{
   }
 
   @Override
-  public ArrayList<EventI> update(float delta, InputState input) {
+  public ArrayList<Event> update(float delta, InputState input) {
     return null;
   }
 
@@ -76,6 +77,14 @@ public class Building implements EntityI{
   @Override
   public float height() {
     return canvas.canvas().height()*physics.physScale();
+  }
+  
+  public boolean alive() {
+    return true;
+  }
+  
+  public Body body() {
+    return physics.body();
   }
 
 }

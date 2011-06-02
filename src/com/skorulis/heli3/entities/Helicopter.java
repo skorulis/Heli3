@@ -4,20 +4,21 @@ package com.skorulis.heli3.entities;
 import java.util.ArrayList;
 
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
+import com.skorulis.forplay.entities.Entity;
+import com.skorulis.forplay.entities.Event;
+import com.skorulis.forplay.entities.PhysicsComponent;
+import com.skorulis.forplay.util.AnimatedImage;
 import com.skorulis.forplay.util.InputState;
-import com.skorulis.heli3.components.AnimatedImage;
-import com.skorulis.heli3.components.EntityI;
 import com.skorulis.heli3.components.EntityImageManager;
-import com.skorulis.heli3.components.EventI;
-import com.skorulis.heli3.components.PhysicsComponent;
 
 import forplay.core.Layer;
 
-public class Helicopter implements EntityI{
+public class Helicopter implements Entity{
 
   private static final int WIDTH = 30;
   private static final int HEIGHT = 15;
@@ -59,7 +60,7 @@ public class Helicopter implements EntityI{
   }
 
   @Override
-  public ArrayList<EventI> update(float delta,InputState input) {
+  public ArrayList<Event> update(float delta,InputState input) {
     image.update(delta);
     if(input.keyDown('W')) {
       physics.move(new Vec2(0,-50*physics.physScale()*delta));
@@ -74,7 +75,7 @@ public class Helicopter implements EntityI{
     cooldown-=delta;
     if(input.mouseDown() && cooldown <=0) {
       Bullet b = new Bullet(physics.x(), physics.y(),input.mouseDir(physics.body().getPosition()),  physics.body().getWorld(),physics.physScale());
-      ArrayList<EventI> ret = new ArrayList<EventI>();
+      ArrayList<Event> ret = new ArrayList<Event>();
       ret.add(b);
       cooldown = firerate;
       return ret;
@@ -96,6 +97,14 @@ public class Helicopter implements EntityI{
   @Override
   public float height() {
     return HEIGHT*physics.physScale();
+  }
+  
+  public boolean alive() {
+    return true;
+  }
+  
+  public Body body() {
+    return physics.body();
   }
   
 }

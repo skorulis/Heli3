@@ -4,22 +4,23 @@ import java.util.ArrayList;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
+import com.skorulis.forplay.entities.Entity;
+import com.skorulis.forplay.entities.Event;
+import com.skorulis.forplay.entities.PhysicsComponent;
 import com.skorulis.forplay.util.InputState;
-import com.skorulis.heli3.components.EntityI;
 import com.skorulis.heli3.components.EntityImageManager;
-import com.skorulis.heli3.components.EventI;
-import com.skorulis.heli3.components.PhysicsComponent;
 import com.skorulis.heli3.core.EventTypes;
 
 import forplay.core.ImageLayer;
 import forplay.core.Layer;
 import static forplay.core.ForPlay.*;
 
-public class Bullet implements EntityI,EventI{
+public class Bullet implements Entity,Event{
 
   private ImageLayer image;
   private PhysicsComponent physics;
@@ -27,6 +28,7 @@ public class Bullet implements EntityI,EventI{
   private float timeAlive;
   private EntityImageManager imageMan;
   private static final int RADIUS = 8; 
+  private float life;
   
   public Bullet(float x,float y,Vec2 vel,World world,float physScale) {
     physics = new PhysicsComponent(BodyType.DYNAMIC,physScale);
@@ -39,7 +41,7 @@ public class Bullet implements EntityI,EventI{
     physics.createBody(world);
     physics.body().setTransform(new Vec2(x,y), 0);
     physics.body().setLinearVelocity(new Vec2(vel.x*200*physScale,vel.y*200*physScale));
-    
+    life = 5;
     //log().debug("VEL " + physics.body().getLinearVelocity());
   }
   
@@ -62,8 +64,9 @@ public class Bullet implements EntityI,EventI{
   }
 
   @Override
-  public ArrayList<EventI> update(float delta, InputState input) {
+  public ArrayList<Event> update(float delta, InputState input) {
 	timeAlive+=delta;
+	life-=delta;
 	if(timeAlive > sensorTime) {
 		this.physics.body().getFixtureList().setSensor(false);
 	}
@@ -88,6 +91,14 @@ public class Bullet implements EntityI,EventI{
   @Override
   public float height() {
     return RADIUS*2*physics.physScale();
+  }
+  
+  public boolean alive() {
+    return life > 0;
+  }
+  
+  public Body body() {
+    return physics.body();
   }
 
 }
