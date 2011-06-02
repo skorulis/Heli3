@@ -3,6 +3,7 @@ package com.skorulis.heli3.core;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -15,6 +16,8 @@ import com.skorulis.heli3.components.EntityI;
 import com.skorulis.heli3.components.EventI;
 import static forplay.core.ForPlay.*;
 
+import forplay.core.CanvasLayer;
+import forplay.core.DebugDrawBox2D;
 import forplay.core.GroupLayer;
 
 public class HeliWorld {
@@ -24,23 +27,62 @@ public class HeliWorld {
 	private LinkedList<EntityI> entities,newEntities;
 	private GroupLayer entityLayer;
 	
-	public HeliWorld(Heli3Game game,int width,int height) {
+	private static boolean showDebugDraw = true;
+  private DebugDrawBox2D debugDraw;
+  private float width,height;
+	
+	public HeliWorld(Heli3Game game,float width,float height,float physScale) {
 	  this.game = game;
-	  Vec2 gravity = new Vec2(0,80);
+	  this.width = width*physScale;
+	  this.height = height*physScale;
+	  Vec2 gravity = new Vec2(0,80*physScale);
 	  world = new World(gravity, true);
 	  entities = new LinkedList<EntityI>();
 	  newEntities = new LinkedList<EntityI>();
 	  entityLayer = graphics().createGroupLayer();
 	  graphics().rootLayer().add(entityLayer);
-	  buildBounds(width, height);
+	  buildBounds(this.width, this.height);
+	  entityLayer.setScale(1f / Heli3Game.physUnitPerScreenUnit);
+	  
+	  showDebugDraw();
 	}
 	
-	private void buildBounds(int width,int height) {
+	private void showDebugDraw() {
+	  if (showDebugDraw) {
+	    int wid = (int) (width / Heli3Game.physUnitPerScreenUnit);
+	    int hgt = (int) (height / Heli3Game.physUnitPerScreenUnit);
+      CanvasLayer canvasLayer =
+          graphics().createCanvasLayer(wid,hgt);
+      graphics().rootLayer().add(canvasLayer);
+      debugDraw = new DebugDrawBox2D();
+      debugDraw.setCanvas(canvasLayer);
+      debugDraw.setFlipY(false);
+      debugDraw.setStrokeAlpha(150);
+      debugDraw.setFillAlpha(75);
+      debugDraw.setStrokeWidth(2.0f);
+      debugDraw.setFlags(DebugDraw.e_shapeBit | DebugDraw.e_jointBit | DebugDraw.e_aabbBit);
+      debugDraw.setCamera(0, 0, 1f / Heli3Game.physUnitPerScreenUnit);
+      world.setDebugDraw(debugDraw);
+    }
+	}
+	
+	private void buildBounds(float width,float height) {
 	  float buffer = 10;
 	  Body ground = world.createBody(new BodyDef());
     PolygonShape groundShape = new PolygonShape();
     groundShape.setAsEdge(new Vec2(0, height), new Vec2(width, height));
     ground.createFixture(groundShape, 0.0f);
+    
+    Body right = world.createBody(new BodyDef());
+    PolygonShape rightShape = new PolygonShape();
+    rightShape.setAsEdge(new Vec2(width, 0), new Vec2(width, height));
+    right.createFixture(rightShape, 0.0f);
+    
+    Body left = world.createBody(new BodyDef());
+    PolygonShape leftShape = new PolygonShape();
+    leftShape.setAsEdge(new Vec2(0, 0), new Vec2(0, height));
+    left.createFixture(leftShape, 0.0f);
+    
 	}
 	
 	public void update(float delta,InputState input) {
@@ -69,6 +111,12 @@ public class HeliWorld {
 	    e = it.next();
 	    e.paint(alpha);
 	  }
+	  
+	  if (showDebugDraw) {
+      debugDraw.getCanvas().canvas().clear();
+      world.drawDebugData();
+    }
+	  
 	}
 	
 	public World world() {
@@ -78,6 +126,10 @@ public class HeliWorld {
 	public void addEntity(EntityI e) {
 	  newEntities.add(e);
 	  entityLayer.add(e.layer());
+	}
+	
+	public GroupLayer entityLayer() {
+	  return entityLayer;
 	}
 	
 }

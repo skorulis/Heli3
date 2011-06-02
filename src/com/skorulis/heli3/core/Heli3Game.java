@@ -19,32 +19,41 @@ public class Heli3Game implements Game{
 	FrameRateCalc frameCalc;
 	HeliWorld world;
 	
+	public static float physUnitPerScreenUnit = 1 / 26.666667f;
+	
 	Helicopter helicopter;
 	InputState input;
+	private LayerTracker tracker;
 	private int width = 600;
 	private int height = 480;
 	
 	@Override
 	public void init() {
 		frameCalc = new FrameRateCalc();
-		world = new HeliWorld(this,width,height);
+		world = new HeliWorld(this,width*5,height,physUnitPerScreenUnit);
 	
 		input = new InputState(256);
-		 helicopter = new Helicopter(world.world());
+		input.setClickLayer(graphics().rootLayer());
+		input.setScale(physUnitPerScreenUnit);
+		 helicopter = new Helicopter(world.world(),physUnitPerScreenUnit);
 		 world.addEntity(helicopter);
 		 keyboard().setListener(input);
 		 pointer().setListener(input);
 		 
-		 Building b = new Building(world.world(),80, 200);
-		 b.physics().body().setTransform(new Vec2(50,height-b.height()), 0);
+		 Building b = new Building(world.world(),80, 200,physUnitPerScreenUnit);
+		 b.physics().setScreenPosition(50,height-200);
 		 world.addEntity(b);
+		 
+		 tracker = new LayerTracker(graphics().rootLayer(), helicopter.layer(),width,height);
+		 tracker.setPhysScale(physUnitPerScreenUnit);
+		 
 	}
 
 	@Override
 	public void update(float delta) {
 	  delta = delta/1000.0f;
 		world.update(delta,input);
-		
+		tracker.update(delta);
 	}
 
 	@Override
