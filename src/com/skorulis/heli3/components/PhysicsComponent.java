@@ -14,12 +14,14 @@ public class PhysicsComponent {
   private Body body;
   private BodyDef bodyDef;
   private FixtureDef fixtureDef;
+  private float physScale;
  
   public PhysicsComponent() {}
-  public PhysicsComponent(BodyType bodyType) {
+  public PhysicsComponent(BodyType bodyType,float physScale) {
     bodyDef = new BodyDef();
     bodyDef.type = bodyType;
     bodyDef.position = new Vec2(0, 0);
+    this.physScale = physScale;
   }
 
   public static Shape getRect(float left,float top,float width,float height) {
@@ -74,6 +76,30 @@ public class PhysicsComponent {
     return body.getPosition().y;
   }
   
+  public float scaleX() {
+    return x()/physScale;
+  }
+  
+  public float scaleY() {
+    return y()/physScale;
+  }
+  
+  /**
+   * Set the position of the object in screen co-ordinates
+   * @param x
+   * @param y
+   */
+  public void setScreenPosition(float x,float y) {
+    body().setTransform(new Vec2(x*physScale,y*physScale), body().getAngle());
+  }
+  
+  public void setPhysScale(float scale) {
+    this.physScale = scale;
+  }
+  
+  public float physScale() {
+    return physScale;
+  }
   
   
 }
