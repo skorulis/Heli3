@@ -10,6 +10,7 @@ import org.jbox2d.dynamics.World;
 
 import com.skorulis.forplay.util.InputState;
 import com.skorulis.heli3.components.EntityI;
+import com.skorulis.heli3.components.EntityImageManager;
 import com.skorulis.heli3.components.EventI;
 import com.skorulis.heli3.components.PhysicsComponent;
 import com.skorulis.heli3.core.EventTypes;
@@ -24,14 +25,20 @@ public class Bullet implements EntityI,EventI{
   private PhysicsComponent physics;
   private float sensorTime= 0.4f;
   private float timeAlive;
+  private EntityImageManager imageMan;
+  private static final int RADIUS = 8; 
   
-  public Bullet(float x,float y,Vec2 vel,World world) {
+  public Bullet(float x,float y,Vec2 vel,World world,float physScale) {
+    physics = new PhysicsComponent(BodyType.DYNAMIC,physScale);
+    imageMan = new EntityImageManager(this);
     image = graphics().createImageLayer(assetManager().getImage("images/bullet.png"));
-    physics = new PhysicsComponent(BodyType.DYNAMIC);
+    image.image().addCallback(imageMan);
+    
+    
     physics.setFixtureDef(getFixtureDef());
     physics.createBody(world);
     physics.body().setTransform(new Vec2(x,y), 0);
-    physics.body().setLinearVelocity(new Vec2(vel.x*22200,vel.y*22200));
+    physics.body().setLinearVelocity(new Vec2(vel.x*200*physScale,vel.y*200*physScale));
     
     //log().debug("VEL " + physics.body().getLinearVelocity());
   }
@@ -39,7 +46,7 @@ public class Bullet implements EntityI,EventI{
   public FixtureDef getFixtureDef() {
     FixtureDef fixtureDef = new FixtureDef();
     CircleShape circleShape = new CircleShape();
-    circleShape.m_radius = 8;
+    circleShape.m_radius = RADIUS*physics.physScale();
     fixtureDef.shape = circleShape;
     fixtureDef.density = 0.4f;
     fixtureDef.friction = 0.00f;
@@ -71,6 +78,16 @@ public class Bullet implements EntityI,EventI{
   @Override
   public int getType() {
     return EventTypes.NEW_ENTITY;
+  }
+
+  @Override
+  public float width() {
+    return RADIUS*2*physics.physScale();
+  }
+
+  @Override
+  public float height() {
+    return RADIUS*2*physics.physScale();
   }
 
 }

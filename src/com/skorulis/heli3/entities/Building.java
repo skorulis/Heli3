@@ -2,7 +2,6 @@ package com.skorulis.heli3.entities;
 
 import java.util.ArrayList;
 
-import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
@@ -23,13 +22,17 @@ public class Building implements EntityI{
   CanvasLayer canvas;
   PhysicsComponent physics;
   
-  public Building(World world,int width,int height) {
+  public Building(World world,int width,int height,float physScale) {
     canvas = graphics().createCanvasLayer(width, height);
-    canvas.canvas().setFillColor(0xFF003388);
-    canvas.canvas().fillRect(0, 0, width, height);
-    physics = new PhysicsComponent(BodyType.STATIC);
+    physics = new PhysicsComponent(BodyType.STATIC,physScale);
     physics.setFixtureDef(getFixtureDef());
     physics.createBody(world);
+    
+    //canvas.setScale(physScale);
+    canvas.canvas().setFillColor(0xFF003388);
+    canvas.canvas().fillRect(0, 0, width*physScale, height*physScale);
+    
+    
   }
   
   public FixtureDef getFixtureDef() {
@@ -65,12 +68,14 @@ public class Building implements EntityI{
     return canvas;
   }
 
-  public int width() {
-	return canvas.canvas().width();
+  @Override
+  public float width() {
+    return canvas.canvas().width()*physics.physScale();
   }
-  
-  public int height() {
-	return canvas.canvas().height();
+
+  @Override
+  public float height() {
+    return canvas.canvas().height()*physics.physScale();
   }
 
 }
