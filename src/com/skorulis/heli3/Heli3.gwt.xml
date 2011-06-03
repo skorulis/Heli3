@@ -6,8 +6,7 @@
   <source path='core'/>
   <source path='html'/>
   <source path='components'/>
-  <source path='base'/>
-  <source path='math'/>
+  <source path='entities'/>
   
 
   <public path="resources" />
