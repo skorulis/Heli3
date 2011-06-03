@@ -14,6 +14,8 @@ import org.jbox2d.dynamics.World;
 import com.skorulis.forplay.entities.Entity;
 import com.skorulis.forplay.entities.Event;
 import com.skorulis.forplay.util.InputState;
+import com.skorulis.forplay.util.WorldUtil;
+
 import static forplay.core.ForPlay.*;
 
 import forplay.core.CanvasLayer;
@@ -41,48 +43,12 @@ public class HeliWorld {
 	  newEntities = new LinkedList<Entity>();
 	  entityLayer = graphics().createGroupLayer();
 	  graphics().rootLayer().add(entityLayer);
-	  buildBounds(this.width, this.height);
+	  WorldUtil.buildBounds(this.width, this.height,world);
 	  entityLayer.setScale(1f / Heli3Game.physUnitPerScreenUnit);
 	  
-	  showDebugDraw();
-	}
-	
-	private void showDebugDraw() {
-	  if (showDebugDraw) {
-	    int wid = (int) (width / Heli3Game.physUnitPerScreenUnit);
-	    int hgt = (int) (height / Heli3Game.physUnitPerScreenUnit);
-      CanvasLayer canvasLayer =
-          graphics().createCanvasLayer(wid,hgt);
-      graphics().rootLayer().add(canvasLayer);
-      debugDraw = new DebugDrawBox2D();
-      debugDraw.setCanvas(canvasLayer);
-      debugDraw.setFlipY(false);
-      debugDraw.setStrokeAlpha(150);
-      debugDraw.setFillAlpha(75);
-      debugDraw.setStrokeWidth(2.0f);
-      debugDraw.setFlags(DebugDraw.e_shapeBit | DebugDraw.e_jointBit | DebugDraw.e_aabbBit);
-      debugDraw.setCamera(0, 0, 1f / Heli3Game.physUnitPerScreenUnit);
-      world.setDebugDraw(debugDraw);
-    }
-	}
-	
-	private void buildBounds(float width,float height) {
-	  float buffer = 10;
-	  Body ground = world.createBody(new BodyDef());
-    PolygonShape groundShape = new PolygonShape();
-    groundShape.setAsEdge(new Vec2(0, height), new Vec2(width, height));
-    ground.createFixture(groundShape, 0.0f);
-    
-    Body right = world.createBody(new BodyDef());
-    PolygonShape rightShape = new PolygonShape();
-    rightShape.setAsEdge(new Vec2(width, 0), new Vec2(width, height));
-    right.createFixture(rightShape, 0.0f);
-    
-    Body left = world.createBody(new BodyDef());
-    PolygonShape leftShape = new PolygonShape();
-    leftShape.setAsEdge(new Vec2(0, 0), new Vec2(0, height));
-    left.createFixture(leftShape, 0.0f);
-    
+	  if(showDebugDraw) {
+	    debugDraw = WorldUtil.showDebugDraw(this.width, this.height, physScale, world);
+	  } 
 	}
 	
 	public void update(float delta,InputState input) {
