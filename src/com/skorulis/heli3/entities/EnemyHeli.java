@@ -17,6 +17,7 @@ public class EnemyHeli extends Helicopter {
   }
   
   public ArrayList<Event> update(float delta,InputState input) {
+	super.commonUpdate(delta);
     image.update(delta);
     Bullet b = ai.update(delta);
     physics.body().setAngularVelocity(0);

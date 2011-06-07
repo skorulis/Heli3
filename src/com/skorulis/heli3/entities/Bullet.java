@@ -43,8 +43,8 @@ public class Bullet implements HeliEntity,Event{
     physics.createBody(source.body().getWorld());
     physics.body().setTransform(new Vec2(source.body().getPosition().x,source.body().getPosition().y), 0);
     physics.body().setLinearVelocity(new Vec2(vel.x*200*physScale,vel.y*200*physScale));
+    physics.body().getFixtureList().m_userData = this;
     life = 5;
-    //log().debug("VEL " + physics.body().getLinearVelocity());
   }
   
   public FixtureDef getFixtureDef() {
@@ -72,6 +72,8 @@ public class Bullet implements HeliEntity,Event{
 	if(timeAlive > sensorTime) {
 		this.physics.body().getFixtureList().setSensor(false);
 	}
+	
+	
     return null;
   }
 

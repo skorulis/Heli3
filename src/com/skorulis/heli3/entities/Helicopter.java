@@ -2,12 +2,14 @@ package com.skorulis.heli3.entities;
 
 
 import java.util.ArrayList;
+import static forplay.core.ForPlay.*;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 
 import com.skorulis.forplay.entities.Entity;
 import com.skorulis.forplay.entities.EntityImageManager;
@@ -22,6 +24,7 @@ import forplay.core.Layer;
 
 public class Helicopter implements HeliEntity{
 
+  protected float maxHealth = 100;
   protected static final int WIDTH = 30;
   protected static final int HEIGHT = 15;
   protected static final int left = -10;
@@ -33,9 +36,11 @@ public class Helicopter implements HeliEntity{
   protected float firerate=0.2f;
   protected float cooldown;
   protected int team;
+  protected float health;
   
   public Helicopter(HeliWorld world,float physScale,int team) {
     this.team = team;
+    health = maxHealth;
     String[] images = new String[] {"images/helicopter.png","images/helicopter2.png"};
     physics = new PhysicsComponent(BodyType.DYNAMIC,physScale);
     physics.bodyDef().position = new Vec2(width()/2,height()/2);
@@ -69,7 +74,7 @@ public class Helicopter implements HeliEntity{
 
   @Override
   public ArrayList<Event> update(float delta,InputState input) {
-    image.update(delta);
+    
     if(input.keyDown('W') ) {
       physics.move(new Vec2(0,-50*physics.physScale()*delta));
     }
@@ -79,8 +84,7 @@ public class Helicopter implements HeliEntity{
     if(input.keyDown('D')) {
       physics.move(new Vec2(10*physics.physScale()*delta,0));
     }
-    physics.body().setAngularVelocity(0);
-    cooldown-=delta;
+    commonUpdate(delta);
     if(input.mouseDown()) {
       Bullet b =fire(input.pointer());
       if(b!=null) {
@@ -89,7 +93,21 @@ public class Helicopter implements HeliEntity{
         return ret;
       } 
     }
+    for(ContactEdge ce=physics.body().getContactList();ce!=null;ce=ce.next) {
+    	log().debug("contact " + ce.contact.m_fixtureB.m_userData);
+    	if(ce.contact.m_fixtureB.m_userData instanceof Bullet) {
+    		//health-=1;
+    		//log().debug("" + health);
+    	}
+    	
+    }
     return null;
+  }
+  
+  protected void commonUpdate(float delta) {
+	  image.update(delta);
+	  physics.body().setAngularVelocity(0);
+	  cooldown-=delta;  
   }
   
   //Attempt to fire a bulllet

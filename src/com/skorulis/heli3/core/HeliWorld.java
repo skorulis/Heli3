@@ -3,8 +3,12 @@ package com.skorulis.heli3.core;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.Contact;
 
 import com.skorulis.forplay.entities.Entity;
 import com.skorulis.forplay.entities.Event;
@@ -18,13 +22,14 @@ import static forplay.core.ForPlay.*;
 import forplay.core.DebugDrawBox2D;
 import forplay.core.GroupLayer;
 
-public class HeliWorld extends EntityWorld<HeliEntity> {
+public class HeliWorld extends EntityWorld<HeliEntity> implements ContactListener{
 
 	private Heli3Game game;
 	
 	public HeliWorld(Heli3Game game,float width,float height,float physScale) {
 	  super(width,height,new Vec2(0,80*physScale),physScale,true);
-	  this.game = game;	 
+	  this.game = game;
+	  world.setContactListener(this);
 	}
 	
 	public void update(float delta,InputState input) {
@@ -61,6 +66,28 @@ public class HeliWorld extends EntityWorld<HeliEntity> {
 	    }
 	  }
 	  return null;
+	}
+
+	@Override
+	public void beginContact(Contact contact) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void endContact(Contact contact) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void preSolve(Contact contact, Manifold oldManifold) {
+		
+	}
+
+	@Override
+	public void postSolve(Contact contact, ContactImpulse impulse) {
+		
 	}
 	
 }

@@ -35,21 +35,21 @@ public class Heli3Game implements Game{
 	
 	@Override
 	public void init() {
-		frameCalc = new FrameRateCalc();
-		world = new HeliWorld(this,width*5,height,physUnitPerScreenUnit);
+	  frameCalc = new FrameRateCalc();
+	  world = new HeliWorld(this,width*5,height,physUnitPerScreenUnit);
 	
-		input = new InputState(256);
-		input.setClickLayer(graphics().rootLayer());
-		input.setScale(physUnitPerScreenUnit);
-		Building b = new Building(world.world(),80, 200,physUnitPerScreenUnit,TEAM_HUMAN);
-    b.physics().setScreenPosition(450,height-200);
-    world.addEntity(b);
+	  input = new InputState(256);
+	  input.setClickLayer(graphics().rootLayer());
+	  input.setScale(physUnitPerScreenUnit);
+	  Building b = new Building(world.world(),80, 200,physUnitPerScreenUnit,TEAM_HUMAN);
+	  b.physics().setScreenPosition(450,height-200);
+	  world.addEntity(b);
     
-    Building enemyB = new Building(world.world(),80, 200,physUnitPerScreenUnit,TEAM_CPU);
-    enemyB.physics().setScreenPosition(750,height-200);
-    world.addEntity(enemyB);
+	  Building enemyB = new Building(world.world(),80, 200,physUnitPerScreenUnit,TEAM_CPU);
+	  enemyB.physics().setScreenPosition(750,height-200);
+	  world.addEntity(enemyB);
 		
-    world.update(0, input);
+	  world.update(0, input);
     
 		helicopter = new Helicopter(world,physUnitPerScreenUnit,TEAM_HUMAN);
 		world.addEntity(helicopter);
