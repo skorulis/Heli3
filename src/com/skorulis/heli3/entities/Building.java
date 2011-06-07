@@ -13,17 +13,20 @@ import com.skorulis.forplay.entities.Entity;
 import com.skorulis.forplay.entities.Event;
 import com.skorulis.forplay.entities.PhysicsComponent;
 import com.skorulis.forplay.util.InputState;
+import com.skorulis.heli3.components.HeliEntity;
 
 import forplay.core.CanvasLayer;
 import forplay.core.Layer;
 import static forplay.core.ForPlay.*;
 
-public class Building implements Entity{
+public class Building implements HeliEntity{
   
   CanvasLayer canvas;
   PhysicsComponent physics;
+  private int team;
   
-  public Building(World world,int width,int height,float physScale) {
+  public Building(World world,int width,int height,float physScale,int team) {
+    this.team = team;
     canvas = graphics().createCanvasLayer(width, height);
     physics = new PhysicsComponent(BodyType.STATIC,physScale);
     physics.setFixtureDef(getFixtureDef());
@@ -85,6 +88,11 @@ public class Building implements Entity{
   
   public Body body() {
     return physics.body();
+  }
+
+  @Override
+  public int team() {
+    return team;
   }
 
 }

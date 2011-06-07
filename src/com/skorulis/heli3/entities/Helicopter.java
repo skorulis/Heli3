@@ -10,34 +10,43 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
 import com.skorulis.forplay.entities.Entity;
+import com.skorulis.forplay.entities.EntityImageManager;
 import com.skorulis.forplay.entities.Event;
 import com.skorulis.forplay.entities.PhysicsComponent;
 import com.skorulis.forplay.util.AnimatedImage;
 import com.skorulis.forplay.util.InputState;
-import com.skorulis.heli3.components.EntityImageManager;
+import com.skorulis.heli3.components.HeliEntity;
+import com.skorulis.heli3.core.HeliWorld;
 
 import forplay.core.Layer;
 
-public class Helicopter implements Entity{
+public class Helicopter implements HeliEntity{
 
-  private static final int WIDTH = 30;
-  private static final int HEIGHT = 15;
-  private int left = -10;
-  private int top = -5;
-  private EntityImageManager imageMan;
+  protected static final int WIDTH = 30;
+  protected static final int HEIGHT = 15;
+  protected static final int left = -10;
+  protected static final int top = -5;
+  protected EntityImageManager imageMan;
   
-  private PhysicsComponent physics;
-  private AnimatedImage image;
-  private float firerate=0.2f;
-  private float cooldown;
+  protected PhysicsComponent physics;
+  protected AnimatedImage image;
+  protected float firerate=0.2f;
+  protected float cooldown;
+  protected int team;
   
-  
-  public Helicopter(World world,float physScale) {
+  public Helicopter(HeliWorld world,float physScale,int team) {
+    this.team = team;
     String[] images = new String[] {"images/helicopter.png","images/helicopter2.png"};
     physics = new PhysicsComponent(BodyType.DYNAMIC,physScale);
+    physics.bodyDef().position = new Vec2(width()/2,height()/2);
     physics.setFixtureDef(getFixtureDef());
-    physics.createBody(world);
-    physics.body().setTransform(new Vec2(150*physScale,50*physScale), 0);
+    physics.createBody(world.world());
+    
+    
+    Building b = (Building) world.findEntity(Building.class, team);
+    
+    
+    physics.body().setTransform(new Vec2(b.physics().x(),b.physics().y()), 0);
     
     imageMan = new EntityImageManager(this);
     image = new AnimatedImage();
@@ -55,14 +64,13 @@ public class Helicopter implements Entity{
 
   @Override
   public void paint(float alpha) {
-    image.layer().setTranslation(physics.x(), physics.y());
-    image.layer().setRotation(physics.body().getAngle());
+    physics.stdPaint(alpha, layer());
   }
 
   @Override
   public ArrayList<Event> update(float delta,InputState input) {
     image.update(delta);
-    if(input.keyDown('W')) {
+    if(input.keyDown('W') ) {
       physics.move(new Vec2(0,-50*physics.physScale()*delta));
     }
     if(input.keyDown('A')) {
@@ -73,15 +81,26 @@ public class Helicopter implements Entity{
     }
     physics.body().setAngularVelocity(0);
     cooldown-=delta;
-    if(input.mouseDown() && cooldown <=0) {
-      Bullet b = new Bullet(physics.x(), physics.y(),input.mouseDir(physics.body().getPosition()),  physics.body().getWorld(),physics.physScale());
-      ArrayList<Event> ret = new ArrayList<Event>();
-      ret.add(b);
-      cooldown = firerate;
-      return ret;
+    if(input.mouseDown()) {
+      Bullet b =fire(input.pointer());
+      if(b!=null) {
+        ArrayList<Event> ret = new ArrayList<Event>();
+        ret.add(b);
+        return ret;
+      } 
     }
-    
     return null;
+  }
+  
+  //Attempt to fire a bulllet
+  public Bullet fire(Vec2 position) {
+    if(cooldown > 0) {
+      return null;
+    }
+    Vec2 dir =position.sub(physics.body().getPosition());dir.normalize();
+    Bullet b = new Bullet(this,dir, physics.physScale());
+    cooldown = firerate;
+    return b;
   }
 
   @Override
@@ -103,8 +122,21 @@ public class Helicopter implements Entity{
     return true;
   }
   
+  public PhysicsComponent physics() {
+    return physics;
+  }
+  
+  public float physScale() {
+    return physics.physScale();
+  }
+  
   public Body body() {
     return physics.body();
+  }
+
+  @Override
+  public int team() {
+    return team;
   }
   
 }

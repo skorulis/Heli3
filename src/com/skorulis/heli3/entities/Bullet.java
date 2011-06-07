@@ -10,17 +10,18 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
 import com.skorulis.forplay.entities.Entity;
+import com.skorulis.forplay.entities.EntityImageManager;
 import com.skorulis.forplay.entities.Event;
 import com.skorulis.forplay.entities.PhysicsComponent;
 import com.skorulis.forplay.util.InputState;
-import com.skorulis.heli3.components.EntityImageManager;
+import com.skorulis.heli3.components.HeliEntity;
 import com.skorulis.heli3.core.EventTypes;
 
 import forplay.core.ImageLayer;
 import forplay.core.Layer;
 import static forplay.core.ForPlay.*;
 
-public class Bullet implements Entity,Event{
+public class Bullet implements HeliEntity,Event{
 
   private ImageLayer image;
   private PhysicsComponent physics;
@@ -29,8 +30,9 @@ public class Bullet implements Entity,Event{
   private EntityImageManager imageMan;
   private static final int RADIUS = 8; 
   private float life;
+  private int team;
   
-  public Bullet(float x,float y,Vec2 vel,World world,float physScale) {
+  public Bullet(HeliEntity source,Vec2 vel,float physScale) {
     physics = new PhysicsComponent(BodyType.DYNAMIC,physScale);
     imageMan = new EntityImageManager(this);
     image = graphics().createImageLayer(assetManager().getImage("images/bullet.png"));
@@ -38,8 +40,8 @@ public class Bullet implements Entity,Event{
     
     
     physics.setFixtureDef(getFixtureDef());
-    physics.createBody(world);
-    physics.body().setTransform(new Vec2(x,y), 0);
+    physics.createBody(source.body().getWorld());
+    physics.body().setTransform(new Vec2(source.body().getPosition().x,source.body().getPosition().y), 0);
     physics.body().setLinearVelocity(new Vec2(vel.x*200*physScale,vel.y*200*physScale));
     life = 5;
     //log().debug("VEL " + physics.body().getLinearVelocity());
@@ -99,6 +101,15 @@ public class Bullet implements Entity,Event{
   
   public Body body() {
     return physics.body();
+  }
+  
+  public PhysicsComponent physics() {
+    return physics;
+  }
+
+  @Override
+  public int team() {
+    return team;
   }
 
 }
