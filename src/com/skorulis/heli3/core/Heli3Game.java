@@ -31,6 +31,7 @@ public class Heli3Game implements Game{
 	private LayerTracker tracker;
 	private int width = 600;
 	private int height = 480;
+	private float heliTimer;
 	
 	@Override
 	public void init() {
@@ -45,7 +46,7 @@ public class Heli3Game implements Game{
     world.addEntity(b);
     
     Building enemyB = new Building(world.world(),80, 200,physUnitPerScreenUnit,TEAM_CPU);
-    enemyB.physics().setScreenPosition(350,height-200);
+    enemyB.physics().setScreenPosition(750,height-200);
     world.addEntity(enemyB);
 		
     world.update(0, input);
@@ -55,13 +56,9 @@ public class Heli3Game implements Game{
 		keyboard().setListener(input);
 		pointer().setListener(input);
 		 
+		tracker = new LayerTracker(graphics().rootLayer(), helicopter.layer(),width,height);
+		tracker.setPhysScale(physUnitPerScreenUnit);
 		 
-		 
-		 tracker = new LayerTracker(graphics().rootLayer(), helicopter.layer(),width,height);
-		 tracker.setPhysScale(physUnitPerScreenUnit);
-		 
-		 EnemyHeli enemy = new EnemyHeli(world, physUnitPerScreenUnit,TEAM_CPU);
-		 world.addEntity(enemy);
 	}
 
 	@Override
@@ -69,6 +66,10 @@ public class Heli3Game implements Game{
 	  delta = delta/1000.0f;
 		world.update(delta,input);
 		tracker.update(delta);
+		if(heliTimer<=0) {
+		  addEnemy();
+		}
+		heliTimer-=delta;
 	}
 
 	@Override
@@ -83,6 +84,12 @@ public class Heli3Game implements Game{
 		return 25;
 	}
 
+	private void addEnemy() {
+	  EnemyHeli enemy = new EnemyHeli(world, physUnitPerScreenUnit,TEAM_CPU);
+    world.addEntity(enemy);
+    heliTimer = 10;
+	}
+	
   public void processEvent(Event event) {
     if(event.getType()==EventTypes.NEW_ENTITY) {
       world.addEntity((HeliEntity)event);
